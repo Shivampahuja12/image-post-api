@@ -142,13 +142,3 @@ GET /posts
   ]
 }
 ```
-
----
-
-## 📝 License
-
-ISC
-
----
-
-<p align="center">Made with ❤️ by Shivam</p>
