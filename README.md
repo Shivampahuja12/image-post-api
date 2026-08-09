@@ -1,4 +1,4 @@
-# 📸 Postify API
+# image-post-api
 
 A RESTful backend API for creating and fetching image posts with captions. Built with **Node.js**, **Express**, **MongoDB**, and **ImageKit** for cloud image storage.
 
@@ -6,10 +6,9 @@ A RESTful backend API for creating and fetching image posts with captions. Built
 
 ## 🚀 Features
 
-- **Image Upload** — Upload images via multipart form-data, stored on ImageKit cloud
-- **Post Creation** — Create posts with an image and caption
+- **Image Upload** — Upload images via multipart form-data using Multer (in-memory storage), then stored on ImageKit cloud
+- **Post Creation** — Create posts with an image URL and caption, saved to MongoDB
 - **Fetch Posts** — Retrieve all posts from the database
-- **Cloud Storage** — Images are hosted on ImageKit CDN for fast delivery
 
 ---
 
@@ -21,27 +20,28 @@ A RESTful backend API for creating and fetching image posts with captions. Built
 | [Express 5](https://expressjs.com/) | Web framework |
 | [MongoDB](https://www.mongodb.com/) | NoSQL database |
 | [Mongoose](https://mongoosejs.com/) | MongoDB ODM |
-| [Multer](https://github.com/expressjs/multer) | File upload middleware |
-| [ImageKit](https://imagekit.io/) | Cloud image storage & CDN |
+| [Multer](https://github.com/expressjs/multer) | File upload middleware (memory storage) |
+| [ImageKit](https://imagekit.io/) | Cloud image storage |
 | [dotenv](https://github.com/motdotla/dotenv) | Environment variable management |
+| [nodemon](https://nodemon.io/) | Auto-restart dev server (dev dependency) |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-postify-api/
-├── server.js                  # Entry point — starts the server
-├── package.json               # Dependencies & scripts
+image-post-api/
+├── server.js                  # Entry point — connects to DB & starts server on port 3000
+├── package.json
 ├── .env                       # Environment variables (not committed)
 └── src/
-    ├── app.js                 # Express app setup & routes
+    ├── app.js                 # Express app, Multer config & route handlers
     ├── db/
-    │   └── db.js              # MongoDB connection
+    │   └── db.js              # MongoDB connection via Mongoose
     ├── models/
-    │   └── post.model.js      # Mongoose schema for posts
+    │   └── post.model.js      # Post schema (image, caption)
     └── services/
-        └── storage.service.js # ImageKit upload logic
+        └── storage.service.js # ImageKit file upload (base64)
 ```
 
 ---
@@ -50,15 +50,15 @@ postify-api/
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Node.js](https://nodejs.org/)
 - [MongoDB](https://www.mongodb.com/) (local or Atlas)
-- [ImageKit](https://imagekit.io/) account (free tier available)
+- [ImageKit](https://imagekit.io/) account
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/postify-api.git
-cd postify-api
+git clone https://github.com/Shivampahuja12/image-post-api.git
+cd image-post-api
 ```
 
 ### 2. Install dependencies
@@ -69,7 +69,7 @@ npm install
 
 ### 3. Set up environment variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory with:
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
@@ -92,22 +92,28 @@ The server will start at **http://localhost:3000**
 
 ```
 POST /create-posts
+Content-Type: multipart/form-data
 ```
 
-| Parameter | Type | Location | Description |
-|---|---|---|---|
-| `image` | `file` | form-data | The image file to upload |
-| `caption` | `string` | form-data | Caption for the post |
+| Field | Type | Description |
+|---|---|---|
+| `image` | `file` | The image file to upload |
+| `caption` | `text` | Caption for the post |
 
-**Example Response** `201 Created`
+**How it works:**
+1. Multer reads the uploaded file into memory
+2. The file buffer is converted to base64 and uploaded to ImageKit
+3. The returned ImageKit URL and the caption are saved as a new post in MongoDB
+
+**Response** `201 Created`
 
 ```json
 {
   "message": "Post created successfully",
   "post": {
-    "_id": "64a1b2c3d4e5f6a7b8c9d0e1",
-    "image": "https://ik.imagekit.io/your_id/image.jpg",
-    "caption": "A beautiful sunset 🌅",
+    "_id": "...",
+    "image": "https://ik.imagekit.io/.../image.jpg",
+    "caption": "your caption here",
     "__v": 0
   }
 }
@@ -121,16 +127,16 @@ POST /create-posts
 GET /posts
 ```
 
-**Example Response** `200 OK`
+**Response** `200 OK`
 
 ```json
 {
   "message": "Posts fetched successfully",
   "posts": [
     {
-      "_id": "64a1b2c3d4e5f6a7b8c9d0e1",
-      "image": "https://ik.imagekit.io/your_id/image.jpg",
-      "caption": "A beautiful sunset 🌅",
+      "_id": "...",
+      "image": "https://ik.imagekit.io/.../image.jpg",
+      "caption": "your caption here",
       "__v": 0
     }
   ]
@@ -139,26 +145,9 @@ GET /posts
 
 ---
 
-## 🧪 Testing with Postman
-
-1. Open [Postman](https://www.postman.com/)
-2. Create a **POST** request to `http://localhost:3000/create-posts`
-3. Go to **Body** → select **form-data**
-4. Add key `image` (type: **File**) and select an image
-5. Add key `caption` (type: **Text**) and enter your caption
-6. Hit **Send**
-
----
-
 ## 📝 License
 
-This project is licensed under the [ISC License](https://opensource.org/licenses/ISC).
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to open an issue or submit a pull request.
+ISC
 
 ---
 
