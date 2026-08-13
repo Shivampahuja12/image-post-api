@@ -150,16 +150,3 @@ GET /posts
 ```
 
 ---
-
-## 🔗 Connecting a React Frontend
-
-Since CORS is enabled, you can connect any React (or other) frontend to this API:
-
-```javascript
-// Example: Fetch all posts from a React app
-const response = await fetch('http://localhost:3000/posts');
-const data = await response.json();
-console.log(data.posts);
-```
-
----
