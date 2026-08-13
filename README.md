@@ -1,29 +1,35 @@
-# image-post-api
+# 📸 image-post-api
 
-A RESTful backend API for creating and fetching image posts with captions. Built with **Node.js**, **Express**, **MongoDB**, and **ImageKit** for cloud image storage.
+> ### A small **MERN stack** app — this is the backend API that powers image post creation and retrieval.
+
+A RESTful backend API for creating and fetching image posts with captions. Built with the **MERN** stack (**M**ongoDB · **E**xpress · **R**eact · **N**ode.js). This repository contains the **backend** — a Node.js + Express server that handles image uploads via **ImageKit** cloud storage and persists posts to **MongoDB**.
+
+> 💡 *Designed as a small, focused MERN project to demonstrate a clean REST API with cloud image storage, CORS-enabled for seamless integration with any React (or other) frontend.*
 
 ---
 
 ## 🚀 Features
 
-- **Image Upload** — Upload images via multipart form-data using Multer (in-memory storage), then stored on ImageKit cloud
+- **Image Upload** — Upload images via multipart form-data using Multer v2 (in-memory storage), then stored on ImageKit cloud
 - **Post Creation** — Create posts with an image URL and caption, saved to MongoDB
 - **Fetch Posts** — Retrieve all posts from the database
+- **CORS Enabled** — Cross-Origin Resource Sharing enabled out of the box, ready to connect with any frontend client
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| [Node.js](https://nodejs.org/) | JavaScript runtime |
-| [Express 5](https://expressjs.com/) | Web framework |
-| [MongoDB](https://www.mongodb.com/) | NoSQL database |
-| [Mongoose](https://mongoosejs.com/) | MongoDB ODM |
-| [Multer](https://github.com/expressjs/multer) | File upload middleware (memory storage) |
-| [ImageKit](https://imagekit.io/) | Cloud image storage |
-| [dotenv](https://github.com/motdotla/dotenv) | Environment variable management |
-| [nodemon](https://nodemon.io/) | Auto-restart dev server (dev dependency) |
+| Technology | Version | Purpose |
+|---|---|---|
+| [Node.js](https://nodejs.org/) | — | JavaScript runtime |
+| [Express](https://expressjs.com/) | 5.x | Web framework |
+| [MongoDB](https://www.mongodb.com/) | — | NoSQL database |
+| [Mongoose](https://mongoosejs.com/) | 9.x | MongoDB ODM |
+| [Multer](https://github.com/expressjs/multer) | 2.x | File upload middleware (memory storage) |
+| [@imagekit/nodejs](https://imagekit.io/) | 7.x | Cloud image storage SDK |
+| [cors](https://github.com/expressjs/cors) | 2.x | Cross-Origin Resource Sharing middleware |
+| [dotenv](https://github.com/motdotla/dotenv) | 17.x | Environment variable management |
+| [nodemon](https://nodemon.io/) | 3.x | Auto-restart dev server (dev dependency) |
 
 ---
 
@@ -35,13 +41,13 @@ image-post-api/
 ├── package.json
 ├── .env                       # Environment variables (not committed)
 └── src/
-    ├── app.js                 # Express app, Multer config & route handlers
+    ├── app.js                 # Express app, CORS, Multer config & route handlers
     ├── db/
     │   └── db.js              # MongoDB connection via Mongoose
     ├── models/
     │   └── post.model.js      # Post schema (image, caption)
     └── services/
-        └── storage.service.js # ImageKit file upload (base64)
+        └── storage.service.js # ImageKit file upload (base64) using @imagekit/nodejs SDK
 ```
 
 ---
@@ -101,8 +107,8 @@ Content-Type: multipart/form-data
 | `caption` | `text` | Caption for the post |
 
 **How it works:**
-1. Multer reads the uploaded file into memory
-2. The file buffer is converted to base64 and uploaded to ImageKit
+1. Multer reads the uploaded file into memory (memory storage)
+2. The file buffer is converted to base64 and uploaded to ImageKit via the `@imagekit/nodejs` SDK
 3. The returned ImageKit URL and the caption are saved as a new post in MongoDB
 
 **Response** `201 Created`
@@ -145,10 +151,15 @@ GET /posts
 
 ---
 
-## 📝 License
+## 🔗 Connecting a React Frontend
 
-ISC
+Since CORS is enabled, you can connect any React (or other) frontend to this API:
+
+```javascript
+// Example: Fetch all posts from a React app
+const response = await fetch('http://localhost:3000/posts');
+const data = await response.json();
+console.log(data.posts);
+```
 
 ---
-
-<p align="center">Made with ❤️ by Shivam</p>
