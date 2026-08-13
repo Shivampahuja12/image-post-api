@@ -3,6 +3,9 @@ const multer = require('multer')
 const uploadFile = require('./services/storage.service')
 const app = express();
 const postModel = require('./models/post.model')
+const cors = require('cors')
+
+app.use(cors())
 
 // it is used to make the req.body data readable
 app.use(express.json())
